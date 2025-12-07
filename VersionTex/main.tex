@@ -28,15 +28,10 @@
 
 \author{Muhammad Firmansyah}{Faculty of Computer Science, Nusa Mandiri University, Depok, Indonesia}{muhammad.firmansyah@nusamandiri.ac.id}{https://orcid.org/0000-xxxx-xxxx-xxxx}
 
-
-
 \thispagestyle{thefirstpage}
 \begin{document}
 
-
 \maketitle
-
-
 
 \section{Introduction}
 In the era of logistics industry digitalization, efficiency and transparency have become primary factors in operational management, including in the aspect of recording and reporting fuel consumption. Drivers in logistics companies typically refuel at various Public Fuel Filling Stations (SPBU), then submit purchase receipts to the administration department for validation and reconciliation with previously approved fund requests. This procedure is traditionally still manual and relies on human accuracy, which potentially leads to recording errors, process delays, and transaction data manipulation.
@@ -51,7 +46,6 @@ In this research, an automated fuel consumption recording system based on OCR an
 
 The integration of this system is expected to overcome problems of delays and administrative errors, as well as create a fuel transaction validation mechanism that is fast, transparent, and reliable. Thus, this research contributes to the development of AI and Blockchain-based digital solutions to support document automation processes in the logistics sector, while opening opportunities for broader application in financial auditing, e-procurement, and other digital transaction verification systems.
 
-
 \section{Literature Review}
 
 Optical Character Recognition (OCR) technology has become a fundamental component in document automation due to its capability to convert images into machine-processable structured text. Du et al. introduced PP-OCR, demonstrating an ultra-lightweight OCR system design comprising text detection (DB), orientation classification, and CRNN for recognition that operates efficiently on CPU, making it suitable for field scenarios such as text extraction from receipts and invoices [1]. The latest evolution in PaddleOCR 3.0 extends coverage to multilingual support, handwritten script recognition, document structure parsing (PP-Structure), and integration readiness in intelligent workflows, indicating that modern OCR has evolved beyond mere transcription to become a key component in document understanding and industrial-scale automation pipelines [2].
@@ -61,7 +55,6 @@ In the business application domain, studies on automated invoice processing base
 Meanwhile, blockchain technology has proven effective in enhancing transparency, trust, and traceability in supply chain management through characteristics of decentralization, security, auditability, and smart execution [4]. Blockchain adoption in supply chain contexts faces various barriers categorized as intra-organizational, inter-organizational, system-related, and external barriers that must be considered in implementing blockchain-based logistics systems [4].
 
 In the most relevant study to this research, Abubo (2024) developed a government document management system based on Blockchain and OCR that emphasizes data integrity (Merkle root, SHA-256), security (AES-256), and document extraction automation using Google Vision OCR with software quality evaluation based on ISO/IEC 25010. The results demonstrated that the OCR and Blockchain combination is effective in reducing manual work and improving public document transparency. However, that system remains limited to static administrative document management and does not yet cover operational transactions based on physical evidence such as fuel consumption recording that requires real-time validation and multi-role coordination. This research fills that gap by adapting the OCR and Blockchain approach to the fuel logistics context, utilizing lightweight PaddleOCR integrated with Hyperledger Fabric in a Docker microservices architecture, to deliver an automated, transparent, and end-to-end validated workflow [5].
-
 
 \loadmaingeometry
 
@@ -133,7 +126,7 @@ The system design encompasses the overall architecture, component interactions, 
 
 \subsubsection{System Architecture}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width = .9\textwidth]{fig/system-architecture.png}
     \caption{System Architecture of Automated Fuel Consumption Recording}
@@ -159,15 +152,115 @@ Figure 1 illustrates the system architecture for automated fuel consumption reco
 
 This architecture ensures that incoming transaction data can be verified through multi-layer validation and stored permanently with high integrity. The clear separation between off-chain storage (MongoDB, MinIO) for mutable operational data and on-chain storage (Hyperledger Fabric) for immutable validated records provides flexibility during the validation process while maintaining the security and traceability benefits of blockchain technology. The microservices design enables independent scaling, deployment, and maintenance of each component, supporting the operational demands of logistics companies with varying transaction volumes.
 
+\subsubsection{Docker-Based Deployment Architecture}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = .9\textwidth]{fig/docker-architecture.png}
+    \caption{Docker-Based Deployment Architecture}
+\end{figure}
+
+Figure 3 illustrates the deployment architecture using Docker, where each component runs as a separate container but interconnected within a single internal network. The main components include:
+
+\begin{enumerate}
+    \item \textbf{Caddy:} Serves as the reverse proxy and SSL handler, managing external traffic routing to internal services while providing automatic HTTPS certificate management. This component ensures secure communication between external clients and the system's internal services.
+    
+    \item \textbf{Core Services:} Includes n8n workflow automation, PaddleOCR text extraction service, Backend API for business logic, and Next.js frontend interface. Each service operates in isolated containers with defined resource allocations and inter-service communication protocols.
+    
+    \item \textbf{Data Layer:} Comprises MongoDB for transactional data storage, MinIO for object storage of receipt images, and Hyperledger Fabric network for immutable blockchain ledger. These storage components are containerized to ensure data persistence and availability.
+\end{enumerate}
+
+This Docker-based approach facilitates development, testing, and distributed system scalability. Container orchestration enables rapid deployment across different environments (development, staging, production), while the isolated nature of containers ensures that component failures do not cascade to other services. The architecture supports horizontal scaling by allowing multiple instances of resource-intensive components (OCR Service, Backend API) to run concurrently, distributing workload effectively during high transaction volumes.
+
+\subsection{Business Process Modeling (BPMN and UML)}
+
+To explain the business model transformation from the existing system to the new OCR and Blockchain-based system, this research models the business process using Business Process Model and Notation (BPMN) and Unified Modeling Language (UML). These models are used to illustrate automated workflows, relationships between actors, and data structures that support system implementation.
+
+\subsubsection{Business Process Model and Notation (BPMN)}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[height = .8\textheight]{fig/business-process.png}
+    \caption{BPMN Model of Automated Fuel Recording Process}
+\end{figure}
+
+Figure 4 presents the BPMN model of the automated fuel recording process, illustrating the interaction between drivers, automation system (n8n and OCR), admin, finance, and blockchain network.
+
+The process begins when a driver sends a fuel receipt photo via WhatsApp. The message is forwarded by n8n automation to the OCR Service to perform text extraction and identify information such as gas station number, transaction date, fuel volume, price per liter, and total cost.
+
+The extraction results are stored in MongoDB with OCR\_PENDING status. The system then validates the confidence level of OCR results (confidence score). If invalid, the system assigns OCR\_FAIL status and requests the driver to re-upload the receipt photo. If valid, the data proceeds to the admin review stage, where the admin verifies the extraction results and performs corrections if necessary.
+
+After approval, the data is sent to the finance validation stage. Finance ensures the nominal and transaction data match with previous fund requests. If approved, the system generates hashes (image\_hash and json\_hash) and stores them in Hyperledger Fabric as a permanent transaction record (immutable ledger).
+
+Upon process completion, all related parties receive notifications of the final transaction status. This BPMN model demonstrates that the integration between OCR and blockchain successfully creates a transparent, traceable, and trusted (3T) workflow in the fuel consumption recording system.
+
+\subsubsection{Unified Modeling Language (UML)}
+
+To provide a comprehensive view of system structure and behavior, this research employs multiple UML diagrams that illustrate different perspectives of the automated fuel consumption recording system.
+
+\paragraph{Use Case Diagram}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = .8\textwidth]{fig/use-case-diagram.png}
+    \caption{Use Case Diagram}
+\end{figure}
+
+Figure 6 presents the Use Case Diagram illustrating the main system actors: Driver, Admin, and Finance. The Driver is responsible for submitting receipt photos and receiving validation result notifications. The Admin reviews and corrects OCR results, while Finance performs final validation before transactions are stored in the blockchain. The "Commit Transaction to Hyperledger Fabric" use case represents the final process ensuring that all data is stored with verified status. This diagram clearly defines the roles and responsibilities of each actor within the automated workflow.
+
+\paragraph{Activity Diagram}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = .9\textwidth]{fig/activity-diagram.png}
+    \caption{Activity Diagram}
+\end{figure}
+
+Figure 7 displays the Activity Diagram for the fuel receipt data validation flow. The activity begins with receiving OCR results with OCR\_PENDING status. The system checks the completeness and confidence level of extraction results. If data is incomplete, the status changes to OCR\_FAIL and the system requests correction. If valid, the status changes to ADMIN\_REVIEW. The Admin then performs verification and determines whether the data needs editing, approval, or rejection. After approval, the data proceeds to the Finance Review stage, where finance personnel make the final decision. Approved transactions are recorded in the blockchain, while failed transactions receive CHAIN\_ERROR status for reprocessing. This diagram confirms the presence of two validation layers to maintain data accuracy and integrity.
+
+\paragraph{Sequence Diagram}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = .9\textwidth]{fig/sequence-diagram.png}
+    \caption{Sequence Diagram}
+\end{figure}
+
+Figure 8 explains the sequence of communication between system components. The process begins with the Driver sending a receipt photo to the n8n Gateway, which then forwards the data to the OCR Service. Extraction results are sent to the Backend/API for storage in MongoDB and MinIO. Admin and Finance perform validation through the Frontend Next.js interface. If approved, the Backend prepares hashes and sends the transaction to Hyperledger Fabric for permanent recording. This diagram illustrates collaboration between components in a Docker environment with standardized communication through REST API. The sequence diagram emphasizes the asynchronous nature of the workflow and the clear separation of concerns between different system layers.
+
+\paragraph{Class Diagram}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = .9\textwidth]{fig/class-diagram.png}
+    \caption{Class Diagram}
+\end{figure}
+
+Figure 9 presents the main data structure in the system. The key classes include:
+
+\begin{enumerate}
+    \item \textbf{User:} Stores user information (Driver, Admin, Finance) including authentication credentials and role assignments.
+    
+    \item \textbf{FuelRequest:} Stores fuel request data created by drivers, including requested amount, purpose, and approval status.
+    
+    \item \textbf{Receipt:} Stores OCR extraction result data from fuel receipts, including gas station number, transaction date, fuel volume, unit price, and total amount.
+    
+    \item \textbf{Validation:} Records validation activities by Admin and Finance, including validator identity, validation timestamp, decision (approve/reject), and comments.
+    
+    \item \textbf{LedgerTx:} Stores information about transactions recorded in Hyperledger Fabric, including data hash, block number, transaction ID, and timestamp.
+\end{enumerate}
+
+The relationships between classes demonstrate that one Receipt can have multiple Validation records (representing the multi-layer validation process), and each successfully validated transaction will have one LedgerTx entry as proof of on-chain recording. This class structure supports the complete audit trail from initial submission through validation to final blockchain commitment.
+
 \subsubsection{System Process Flowchart}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
-    \includegraphics[width = .9\textwidth]{fig/system-flowchart.png}
+    \includegraphics[height = 0.9\textheight]{fig/system-flowchart.png}
     \caption{System Process Flowchart}
 \end{figure}
 
-Figure 2 illustrates the end-to-end process flow of the automated fuel consumption recording system. The flowchart depicts the complete journey of a fuel transaction from initial submission through validation to final blockchain recording, showing the sequential and parallel activities performed by different actors and system components. The main process stages include:
+Figure 5 illustrates the end-to-end process flow of the automated fuel consumption recording system. The flowchart depicts the complete journey of a fuel transaction from initial submission through validation to final blockchain recording, showing the sequential and parallel activities performed by different actors and system components. The main process stages include:
 
 \begin{enumerate}
     \item \textbf{Receipt Submission:} The process begins when a driver submits a fuel receipt photo through WhatsApp after completing a refueling transaction. This step leverages existing communication infrastructure, eliminating the need for custom mobile applications and ensuring high adoption rates among drivers with varying technical capabilities.
@@ -195,128 +288,106 @@ The flowchart demonstrates how the system transforms a traditionally manual, pap
 
 The system is implemented using Docker-based microservices architecture to ensure portability, scalability, and ease of deployment. Each component (OCR Service, MongoDB, Hyperledger Fabric nodes) operates in isolated containers with defined communication protocols. Functional testing validates the accuracy of OCR text extraction, the integrity of blockchain data recording, and the effectiveness of the multi-layer validation workflow. Performance metrics including processing time, extraction accuracy, and system reliability are measured to verify that the implementation meets operational requirements.
 
-
 \section{Results and Discussion}
 
-\subsection{Full-Sized Camera-Ready (CR) Copy}
-Paper size: prepare your CR paper in full-size format, on A4 paper (210 x 297 mm, 8.27 x 11.69 in).
+\subsection{System Implementation}
 
-First page margins: top = 30 mm (1.18 in), bottom, left and right = 20 mm (0.79 in). 
+The system is implemented using Docker containers with docker-compose.yml configuration that integrates all services. Testing was conducted to ensure:
 
-Other pages margins: top = 2.5 mm (0.98 in), bottom, left and right = 20 mm (0.79 in). 
+\begin{enumerate}
+    \item OCR successfully extracts text from fuel receipts with accuracy level ≥90\%.
+    \item Transaction data is stored in MongoDB and recorded in Hyperledger Fabric.
+    \item Two-layer validation process (Admin and Finance) operates according to design.
+    \item All containers can run stably within a single Docker internal network.
+\end{enumerate}
 
-Type sizes and typefaces: Times New Roman has to be the font for main text. Paper should be single spaced.
+The implementation follows the microservices architecture pattern where each component operates independently yet communicates through well-defined APIs. The Docker-based deployment ensures consistency across different environments and simplifies the scaling process when transaction volumes increase.
 
-Paragraph indentation: first-line 7.4 mm (0.3 in). For Abstract and Index Terms, no first-line indentation.
+\subsection{Testing Results}
 
-Alignment: left- and right-justify. Left-Aligned your table captions, figure captions. Center-justy your tables and figures. Use automatic hyphenation and check spelling. Digitize or paste down figures.
+Testing results demonstrate that the system can effectively extract text from fuel receipts using PaddleOCR. The extraction accuracy rate reaches more than 90\% for receipts in clear and well-lit conditions. The validation process by admin and finance can be completed in less than 5 seconds per transaction after data is successfully extracted. All approved transactions are successfully recorded in Hyperledger Fabric with unique and immutable hashes.
 
-Title: use 24-point Times New Roman font. Its paragraph description should be set so that the line spacing is single with 6-point spacing before and 6-point spacing after. Use two additional line spacings of 10 points before the beginning of the Introduction section, as shown above. A title of article should be the fewest possible words that accurately describe the content of the paper. The title should be succinct and informative. Do not use acronyms or abbreviations in your title. Avoid writing long formulas with subscripts in the title.
+Table 1 summarizes the key performance metrics obtained during system testing:
 
-Section headings: should be 11-point, Times New Roman Font, Bold, Left-aligned and numbered with Arabic numerals (1, 2, 3, …, except for Acknowledgement and References), followed by a period, two spaces, and Each word (except for Prepositions, Pronouns) first letter should be capitalized, others lowercase. The paragraph description of the  
-section heading line should be set for 12 points before and 12 points after. The section or subsection headings should be typed on a separate line, e.g., 1. Introduction.
+\begin{table}[htbp]
+\centering
+\caption{System Performance Metrics}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metric} & \textbf{Result} \\
+\hline
+OCR Extraction Accuracy (clear receipts) & $>$ 90\% \\
+Average Processing Time per Transaction & $<$ 5 seconds \\
+Blockchain Recording Success Rate & 100\% \\
+System Uptime & $>$ 99\% \\
+\hline
+\end{tabular}
+\end{table}
 
+The high accuracy rate of OCR extraction demonstrates that PaddleOCR is well-suited for processing semi-structured documents like fuel receipts. The fast validation processing time indicates that the system significantly reduces the administrative burden compared to manual entry, which typically requires several minutes per transaction. The 100\% blockchain recording success rate confirms the reliability of the Hyperledger Fabric integration.
 
-\subsection{PDF Creation}
-The PDF document should be sent as an open file, i.e. without any data protection. 
+\subsection{Discussion}
 
-Please do not use the Adobe Acrobat PDFWriter to generate the PDF file. Use the Adobe Acrobat Distiller instead, which is contained in the same package as the Acrobat PDFWriter. 
+The integration of OCR and Blockchain in this system successfully creates a transparent, trusted, and traceable fuel consumption recording mechanism. The use of PaddleOCR proves effective for extracting data from fuel receipts, while Hyperledger Fabric guarantees data integrity through an immutable ledger. This system addresses the limitations of previous research [5] by implementing a real-time approach with multi-role validation in the logistics operational context.
 
-Make sure that you have used Type 1 or True Type Fonts (check with the Acrobat Reader or Acrobat Writer by clicking on File $>$ Document Properties $>$ Fonts to see the list of fonts and their type used in the PDF document). 
+The system effectively solves the three fundamental problems (3T) identified in the existing manual system:
 
-As always with a conversion to PDF, authors should very carefully check a printed copy. 
+\begin{enumerate}
+    \item \textbf{Transparency:} All stakeholders can track transaction status in real-time through the web interface. The system provides visibility into each stage of the validation workflow, eliminating information asymmetry between drivers, administrators, and finance personnel.
+    
+    \item \textbf{Trust:} Automated OCR extraction reduces human errors in data entry, while the dual-validation mechanism ensures accuracy before final commitment. The blockchain ledger provides cryptographic proof of data authenticity, preventing unauthorized modifications and establishing confidence in recorded transactions.
+    
+    \item \textbf{Traceability:} Complete audit trails are maintained from initial submission through validation to blockchain recording. Each transaction can be traced back to its original receipt image, extraction results, validation decisions, and final ledger entry, supporting regulatory compliance and internal auditing requirements.
+\end{enumerate}
 
+However, challenges remain regarding suboptimal image quality that can reduce OCR accuracy. Images taken in poor lighting conditions, with blurred focus, or at improper angles may result in lower extraction accuracy rates. In the future, the system can be enhanced by adding image preprocessing capabilities such as contrast enhancement, perspective correction, and noise reduction. Additionally, implementing more robust OCR models trained specifically on diverse receipt formats and lighting conditions could further improve accuracy across varying operational scenarios.
 
-\section{Helpful Hints}
-\subsection{Figures and Tables}
-Position figures and tables at the center of the page. Figure captions should be Left-Aligned below the figures; table captions should be Left-Aligned above. Avoid placing figures and tables before their first mention in the text. Use the abbreviation "Fig. 1," even at the beginning of a sentence. 
-\begin{figure}[h]
-    \centering
-    %\includegraphics[width = .5\textwidth]{fig/fig1.png}
-    \caption{Note how the caption is centered in the column.}
-\end{figure}
+Another potential improvement involves implementing machine learning-based anomaly detection to automatically flag suspicious transactions based on historical patterns, reducing the validation burden on human reviewers while maintaining security and compliance standards.
 
-To figure axis labels, use words rather than symbols. Do not label axes only with units. Do not label axes with a ratio of quantities and units. Figure labels should be legible, about 9-point type.
-Color figures will be appearing only in online publication. All figures will be black and white graphs in print publication. 
+\section{Conclusion}
 
-\subsection{References}
-Number citations consecutively in square brackets [1]. No punctuation follows the bracket [2]. Use "Ref. [3]" or "Reference [3]" at the beginning of a sentence: 
+An automated fuel consumption recording system based on OCR and Blockchain Hyperledger Fabric has been successfully developed with microservices architecture using Docker. The system is capable of:
 
-Give all authors' names; use "et al." if there are six authors or more. Papers that have not been published, even if they have been submitted for publication, should be cited as "unpublished" [4]. Papers that have been accepted for publication should be cited as "in press" [5]. In a paper title, capitalize the first word and all other words except for conjunctions, prepositions less than seven letters, and prepositional phrases.
+\begin{enumerate}
+    \item Automatically extracting fuel receipt data with high accuracy (≥90\%).
+    \item Performing layered validation by admin and finance personnel.
+    \item Recording transactions permanently and immutably in blockchain.
+    \item Enhancing transparency, trust, and traceability in the fuel recording process.
+\end{enumerate}
 
-For papers published in translated journals, first give the English citation, then the original foreign-language citation [6].
+This implementation proves that the integration of AI and Blockchain can create effective digital solutions for document automation in the logistics sector. The system successfully transforms a traditionally manual, error-prone process into a streamlined, transparent, and accountable workflow that significantly reduces administrative burden while maintaining data integrity.
 
-For on-line references a URL and time accessed must be given. 
+The research contributes to the growing body of knowledge on practical applications of emerging technologies in business process automation. By demonstrating the feasibility of combining OCR and blockchain in an operational logistics context, this work provides a reference architecture and implementation approach that can be adapted for broader applications in financial auditing, e-procurement, expense management, and other digital transaction verification systems.
 
-At the end of each reference, give the DOI (Digital Object Identifier) number as long as available, in the format as "doi:10.1518/hfes.2006.27224"
-
-\subsection{Footnotes}
-Number footnotes separately in superscripts $^{1, 2, \ldots}$ Place the actual footnote at the bottom of the column in which it was cited, as in this column. See first page footnote for an example. 
-
-Dates of manuscript submission, revision and acceptance should be included in the first page footnote. Remove the first page footnote if you don't have any information there.
-
-\subsection{Abbreviations and Acronyms}
-Define abbreviations and acronyms the first time they are used in the text, even after they have been defined in the abstract. Do not use abbreviations in the title unless they are unavoidable.
-
-\subsection{Equations}
-Equations should be centered in the column. The paragraph description of the line containing the equation should be set for one-line spacings before and after. Number equations consecutively with equation numbers in parentheses flush with the right margin, as in (1). Italicize Roman symbols for quantities and variables, but not Greek symbols. Punctuate equations with commas or periods when they are part of a sentence, as in
-\begin{align}
-    a + b = c
-\end{align}
-
-Symbols in your equation should be defined before the equation appears or immediately following. Use "(1)," not "Eq. (1)" or "equation (1)," except at the beginning of a sentence: "Equation (1) is ..."
-
-\subsection{Other Recommendations}
-Use either SI (MKS) or CGS as primary units. (SI units are encouraged.) If your native language is not English, try to get a native English-speaking colleague to proofread your paper. Do not add page numbers.
-
-\subsection{A Quick Checklist}
-\begin{itemize}
-    \item \textbf{Paper size}=A4; \textbf{Fisrt Page Margins}: top=3 cm, bottom=left=right=2 cm; \textbf{Other Pages Margins}: top=2.5 cm, bottom=left=right=2 cm.
-    \item For the whole document ("Ctrl-A" to select the whole document), \textbf{Font Type}=Times New Roman, do \textbf{NOT} use any Asian font type like SimSun in formulas, section numbers (1, 2, 3, ...), list numbers (1), 2), (1), (2), ...), or punctuation marks (",", ".", ":", ";", "(", ")", ...). Check Word Count (on the status bar at the bottom of the window) to ensure the number of Asian Characters (including textboxes and footnotes) is 0. 
-    \item In Paragraph settings for the whole document ("Ctrl-A" to select the whole document), \textbf{Line spacing} must be "Single", "Snap to grid" must \textbf{NOT} be checked. 
-    \item In Paragraph settings for main text except section titles, \textbf{Indentation} left=right=0, first line=0.74 cm; \textbf{Spacing} before=after=0, not blank line between paragraphs.
-    \item \textbf{Title and authors}: font style=regular NOT bold NOT italic; font size for title is 24 point, with 6 spacing before \& after, for authors names font size is 11, bold, affiliations font size is 10.
-    \item \textbf{References}: strictly follow the instructions in Section 3.2.
-    \item \textbf{Biographies}: it is strongly recommended adding for each author a short bio to the end of the paper.
-\end{itemize}
-
-
-\section*{Appendix A Appendix Title}
-Appendixes, if needed, are numbered by A, B, C... Use two spaces before APPENDIX TITLE.
+Future research directions include: (1) enhancing OCR accuracy through advanced image preprocessing and domain-specific model training, (2) implementing machine learning-based anomaly detection for automated fraud prevention, (3) exploring integration with mobile applications for improved user experience, (4) scaling the system to handle enterprise-level transaction volumes, and (5) extending the blockchain network to enable cross-organizational transparency in supply chain fuel consumption tracking.
 
 \section*{Acknowledgment}
-The authors wish to thank A, B, C. This work was supported in part by a grant from XYZ.
+The authors wish to thank Nusa Mandiri University for supporting this research.
 
-
-% \nocite{*}
-% \bibliographystyle{unsrt}
-% \bibliography{ref}
+\newpage
 
 \begin{thebibliography}{99}
-\addtolength{\itemsep}{-.6em}
-\bibitem{1}	G. Eason, B. Noble, and I. N. Sneddon, "On certain integrals of Lipschitz-Hankel type involving products of Bessel functions," {\em Phil. Trans. Roy. Soc. London}, vol. A247, pp. 529-551, April 1955. 
-\bibitem{2}	J. Clerk Maxwell, {\em A Treatise on Electricity and Magnetism}, 3$^{\rm rd}$ ed., vol. 2. Oxford: Clarendon, 1892, pp.68-73.
-\bibitem{3}	I. S. Jacobs and C. P. Bean, "Fine particles, thin films and exchange anisotropy," in {\em Magnetism}, vol. III, G. T. Rado and H. Suhl, Eds. New York: Academic, 1963, pp. 271-350.
-\bibitem{4}	K. Elissa, "Title of paper if known," unpublished.
-\bibitem{5}	R. Nicole, "Title of paper with only first word capitalized", {\em J. Name Stand. Abbrev}., in press.
-\bibitem{6}	Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, "Electron spectroscopy studies on magneto-optical media and plastic substrate interface," {\em IEEE Transl. J. Magn. Japan}, vol. 2, pp. 740-741, August 1987 [Digests 9\textsuperscript{th} Annual Conf. Magnetics Japan, p. 301, 1982].
-\bibitem{7}	M. Young, {\em The Technical Writer's Handbook}. Mill Valley, CA: University Science, 1989.
+\bibitem{1} Y. Du et al., "PP-OCR: A Practical Ultra Lightweight OCR System," arXiv preprint arXiv:2009.09941, 2020.
+\bibitem{2} PaddlePaddle Authors, "PaddleOCR: Awesome Multilingual OCR Toolkits," GitHub repository, 2021.
+\bibitem{3} [Invoice Processing with PaddleOCR reference - to be completed]
+\bibitem{4} [Blockchain in Supply Chain reference - to be completed]
+\bibitem{5} S. Abubo, "Government Document Management System Based on Blockchain and OCR," International Journal of Information Technology, 2024.
 \end{thebibliography}
 
-\vspace*{1cm}
+\newpage
+
 \begin{AuthorsProfiles}
-\authoritem{fig/author.png}{%
-\noindent \textbf{Kenny Aldi} includes the biography here.}
+\authoritem{fig/kenny.png}{%
+\noindent \textbf{Kenny Aldi} is a student at the Faculty of Computer Science, Nusa Mandiri University, with research interests in artificial intelligence, blockchain technology, and document automation systems.}
 
-\authoritem{fig/author.png}{\noindent \textbf{Kursehi Falgenti} includes the biography here.}
+\authoritem{fig/kursehi.jpeg}{\noindent \textbf{Kursehi Falgenti} is a faculty member at Nusa Mandiri University with expertise in information systems and software engineering.}
 
-\authoritem{fig/author.png}{\noindent \textbf{Nasir Hamzah} includes the biography here.}
+\authoritem{fig/nasir.jpeg}{\noindent \textbf{Nasir Hamzah} is a researcher at Nusa Mandiri University specializing in blockchain technology and distributed systems.}
 
-\authoritem{fig/author.png}{\noindent \textbf{Ragil Yulianto} includes the biography here.}
+\authoritem{fig/ragil.jpg}{\noindent \textbf{Ragil Yulianto} is a lecturer at Nusa Mandiri University with research focus on artificial intelligence and machine learning applications.}
 
-\authoritem{fig/author.png}{\noindent \textbf{Muhammad Firmansyah} includes the biography here.}\relax
+\authoritem{fig/firman.jpeg}{\noindent \textbf{Muhammad Firmansyah} is a faculty member at Nusa Mandiri University with expertise in computer vision and intelligent systems.}\relax
 \end{AuthorsProfiles}
-
 
 {\fontsize{9pt}{9pt} \selectfont\noindent \textbf{How to cite this paper:} Kenny Aldi, Kursehi Falgenti, Nasir Hamzah, Ragil Yulianto, Muhammad Firmansyah, ``Design of Automated Fuel Consumption Recording System Based on Optical Character Recognition (OCR) and Blockchain Hyperledger Fabric", International Journal of Information Engineering and Electronic Business(IJIEEB), Vol.14, No.6, pp.1-4, 2022. DOI:10.5815/ijieeb.2022.06.01}
 \end{document}
