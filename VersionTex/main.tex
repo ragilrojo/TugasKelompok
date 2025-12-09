@@ -1,6 +1,7 @@
 \documentclass{ijieeb}
 
 \usepackage{amsmath,amssymb,multirow,array}
+\usepackage{cite}  % atau \usepackage{natbib} tergantung style yang diinginkan
 
 \IjieebSet{
     title = {Design of Automated Fuel Consumption Recording System Based on Optical Character Recognition (OCR) and Blockchain Hyperledger Fabric},
@@ -40,7 +41,26 @@ The main problem with this conventional method lies in the lack of automation an
 
 Along with the development of artificial intelligence technology, one approach that can be used to address this problem is Optical Character Recognition (OCR). OCR technology is capable of extracting text information from documents or images automatically, making the data recording process faster and more accurate. In this context, OCR is used to recognize important data on fuel receipts such as SPBU number, transaction date, volume, and total price. However, although OCR can accelerate the digitalization process, challenges related to data authenticity and integrity still need to be addressed.
 
-To ensure the integrity of OCR extraction results, Blockchain technology, particularly through Hyperledger Fabric, is implemented as a security and transparency layer. Blockchain provides an immutable transaction recording mechanism, so that each OCR result data stored will have a digital trace that can be verified by all related parties. This integration between OCR and Blockchain produces a system that is not only efficient, but also accountable and resistant to manipulation.
+To ensure the integrity of OCR extraction results, blockchain technology, 
+particularly through Hyperledger Fabric, is implemented as a security and 
+transparency layer. In multi-party operational contexts, blockchain technology 
+has proven effective in building swift-trust and enhancing collaboration among 
+stakeholders. Dubey et al. (2020) demonstrated that blockchain-enabled 
+operational transparency significantly influences rapid trust formation among 
+actors engaged in multi-organizational operations, with transparency and 
+blockchain technology collectively explaining 57.5 \%  of variance in swift-trust 
+among collaborative partners~\cite{dubey2020blockchain}. This swift-trust 
+mechanism is particularly relevant for fuel consumption recording systems where 
+administrative and finance personnel must rapidly validate transactions without 
+extensive prior coordination history.
+
+To ensure the integrity of OCR extraction results, Blockchain technology, 
+particularly through Hyperledger Fabric, is implemented as a security and 
+transparency layer. Blockchain architectures can be classified based on 
+network type (public, private, hybrid) and ledger structure, with 
+permissioned blockchain platforms being particularly suitable for enterprise 
+applications requiring access control and confidential 
+transactions~\cite{ismail2019review}. Hyperledger Fabric introduces an execute-order-validate architecture that separates transaction execution from consensus, enabling flexible trust assumptions and support for non-deterministic code execution~\cite{androulaki2018hyperledger}. This architecture provides an immutable transaction recording mechanism, ensuring that each OCR result data stored will have a digital trace that can be verified by all related parties. The integration between OCR and Blockchain produces a system that is not only efficient, but also accountable and resistant to manipulation.
 
 In this research, an automated fuel consumption recording system based on OCR and Blockchain is developed. The workflow begins with drivers sending fuel receipt photos through communication platforms such as WhatsApp. The images are automatically processed using n8n automation to be directed to the OCR Service running in Docker containers using PaddleOCR. The extraction results are temporarily stored in MongoDB and subsequently verified by two user layers, namely admin and finance. After validation is complete, the final data will be recorded into the Hyperledger Fabric network as permanent and distributed transactions.
 
@@ -48,15 +68,38 @@ The integration of this system is expected to overcome problems of delays and ad
 
 \section{Literature Review}
 
-Optical Character Recognition (OCR) technology has become a fundamental component in document automation due to its capability to convert images into machine-processable structured text. Du et al. introduced PP-OCR, demonstrating an ultra-lightweight OCR system design comprising text detection (DB), orientation classification, and CRNN for recognition that operates efficiently on CPU, making it suitable for field scenarios such as text extraction from receipts and invoices [1]. The latest evolution in PaddleOCR 3.0 extends coverage to multilingual support, handwritten script recognition, document structure parsing (PP-Structure), and integration readiness in intelligent workflows, indicating that modern OCR has evolved beyond mere transcription to become a key component in document understanding and industrial-scale automation pipelines [2].
+Optical Character Recognition (OCR) technology has become a fundamental component in document automation due to its capability to convert images into machine-processable structured text. Du et al. introduced PP-OCR, demonstrating an ultra-lightweight OCR system design comprising text detection (DB), orientation classification, and CRNN for recognition that operates efficiently on CPU, making it suitable for field scenarios such as text extraction from receipts and invoices. The latest evolution in PaddleOCR 3.0 extends coverage to multilingual support, handwritten script recognition, document structure parsing (PP-Structure), and integration readiness in intelligent workflows, indicating that modern OCR has evolved beyond mere transcription to become a key component in document understanding and industrial-scale automation pipelines ~\cite{cui2025paddleocr}.
 
 In the business application domain, studies on automated invoice processing based on PaddleOCR demonstrate that detection-recognition-layout parsing pipelines can enhance entity extraction reliability (vendor, date, items, quantity, price) while reducing manual errors and processing time, making it directly analogous and relevant for digitizing fuel transaction receipts (SPBU receipts) in logistics and administrative contexts [3]. These findings confirm that mature OCR engines such as PP-OCR and PaddleOCR can be adapted for semi-structured documents like fuel receipts.
 
-Meanwhile, blockchain technology has proven effective in enhancing transparency, trust, and traceability in supply chain management through characteristics of decentralization, security, auditability, and smart execution [4]. Blockchain adoption in supply chain contexts faces various barriers categorized as intra-organizational, inter-organizational, system-related, and external barriers that must be considered in implementing blockchain-based logistics systems [4].
+Meanwhile, blockchain technology has proven effective in enhancing transparency, trust, and traceability in supply chain management through characteristics of decentralization, security, auditability, and smart execution~\cite{saberi2019blockchain}. Fabric is the first blockchain system to support modular consensus protocols and execution of distributed applications written in standard programming languages without dependency on native cryptocurrency~\cite{androulaki2018hyperledger}. This modularity allows the system to be tailored to particular use cases and trust models, making it highly suitable for enterprise applications. Blockchain adoption in supply chain contexts faces various barriers categorized as intra-organizational, inter-organizational, system-related, and external barriers that must be considered in implementing blockchain-based logistics systems~\cite{saberi2019blockchain}.
 
-In the most relevant study to this research, Abubo (2024) developed a government document management system based on Blockchain and OCR that emphasizes data integrity (Merkle root, SHA-256), security (AES-256), and document extraction automation using Google Vision OCR with software quality evaluation based on ISO/IEC 25010. The results demonstrated that the OCR and Blockchain combination is effective in reducing manual work and improving public document transparency. However, that system remains limited to static administrative document management and does not yet cover operational transactions based on physical evidence such as fuel consumption recording that requires real-time validation and multi-role coordination. This research fills that gap by adapting the OCR and Blockchain approach to the fuel logistics context, utilizing lightweight PaddleOCR integrated with Hyperledger Fabric in a Docker microservices architecture, to deliver an automated, transparent, and end-to-end validated workflow [5].
+The application of blockchain in logistics and supply chain operations 
+has been systematically examined by Pournader et al. (2020), who identified 
+four main dimensions of blockchain value proposition: Technology, Trust, 
+Trade, and Traceability/Transparency~\cite{pournader2020blockchain}. 
+Building on this framework, Koh et al. (2020) further elaborated on key 
+paradigms including cross-border management, standards and governance, 
+and the critical role of trust-building through transparency and single 
+version of the truth (SVOT)~\cite{koh2020blockchain}. In the context of 
+fuel consumption recording, these dimensions collectively address the 
+fundamental challenges of ensuring data integrity, facilitating multi-party 
+validation, and maintaining complete audit trails across logistics operations.
 
-\loadmaingeometry
+In supply chain contexts, blockchain-based smart contracts have proven 
+effective in automating multi-party collaborations while maintaining 
+transparency and trust~\cite{rajasanthi2022influence}. Agrawal et al. (2023) 
+demonstrated a blockchain-based framework using smart contracts for supply 
+chain collaboration, showing how automated validation mechanisms can ensure 
+quality and data authenticity across supply networks. Their framework 
+employed Ethereum smart contracts to automate order distribution and resource 
+sharing, which parallels our approach of using smart contracts for automated 
+fuel receipt validation in logistics operations~\cite{agrawal2023demonstration}.
+
+
+In the most relevant study to this research, Abubo (2024) developed a government document management system based on Blockchain and OCR that emphasizes data integrity (Merkle root, SHA-256), security (AES-256), and document extraction automation using Google Vision OCR with software quality evaluation based on ISO/IEC 25010. The results demonstrated that the OCR and Blockchain combination is effective in reducing manual work and improving public document transparency. However, that system remains limited to static administrative document management and does not yet cover operational transactions based on physical evidence such as fuel consumption recording that requires real-time validation and multi-role coordination. This research fills that gap by adapting the OCR and Blockchain approach to the fuel logistics context, utilizing lightweight PaddleOCR integrated with Hyperledger Fabric in a Docker microservices architecture, to deliver an automated, transparent, and end-to-end validated workflow ~\cite{abubo2024blockchain}.
+
+%\loadmaingeometry
 
 \section{Research Methodology}
 
@@ -150,6 +193,8 @@ Figure 1 illustrates the system architecture for automated fuel consumption reco
     \item \textbf{Frontend Interface (Next.js):} Provides the user interface for administrative and finance personnel to perform validation tasks. This web-based application displays extracted OCR data alongside original receipt images, allows validators to approve or reject transactions, and provides real-time visibility into transaction status. The responsive design ensures accessibility across desktop and mobile devices.
 \end{enumerate}
 
+The adoption of microservices architecture in this system addresses several critical challenges inherent in traditional monolithic applications. Microservices provide independent deployability, allowing each component to be developed, tested, and scaled autonomously without affecting the entire system~\cite{dragoni2017microservices}. This architectural style enables the system to avoid technology lock-in, as each microservice can utilize the most appropriate technology stack for its specific functionality. Furthermore, the containerized deployment of microservices through Docker facilitates resource optimization, where services can be scaled individually based on actual demand rather than replicating entire monolithic applications~\cite{dragoni2017microservices}.
+
 This architecture ensures that incoming transaction data can be verified through multi-layer validation and stored permanently with high integrity. The clear separation between off-chain storage (MongoDB, MinIO) for mutable operational data and on-chain storage (Hyperledger Fabric) for immutable validated records provides flexibility during the validation process while maintaining the security and traceability benefits of blockchain technology. The microservices design enables independent scaling, deployment, and maintenance of each component, supporting the operational demands of logistics companies with varying transaction volumes.
 
 \subsubsection{Docker-Based Deployment Architecture}
@@ -160,7 +205,8 @@ This architecture ensures that incoming transaction data can be verified through
     \caption{Docker-Based Deployment Architecture}
 \end{figure}
 
-Figure 3 illustrates the deployment architecture using Docker, where each component runs as a separate container but interconnected within a single internal network. The main components include:
+Figure 3 illustrates the deployment architecture using Docker, where each component runs as a separate container but interconnected within a single internal network. The adoption of containerization through Docker addresses critical requirements for lightweight application packaging, portability, and efficient resource utilization in cloud environments~\cite{pahl2015containerization}. Unlike traditional virtual machines that require full guest OS images, containers share the host OS kernel while maintaining isolation through namespace and cgroup mechanisms, resulting in significantly reduced resource consumption and faster startup times~\cite{pahl2015containerization}. This container-based approach is particularly suitable for microservices architectures where independent service deployment and scalability are essential.
+The main components include:
 
 \begin{enumerate}
     \item \textbf{Caddy:} Serves as the reverse proxy and SSL handler, managing external traffic routing to internal services while providing automatic HTTPS certificate management. This component ensures secure communication between external clients and the system's internal services.
@@ -174,7 +220,7 @@ This Docker-based approach facilitates development, testing, and distributed sys
 
 \subsection{Business Process Modeling (BPMN and UML)}
 
-To explain the business model transformation from the existing system to the new OCR and Blockchain-based system, this research models the business process using Business Process Model and Notation (BPMN) and Unified Modeling Language (UML). These models are used to illustrate automated workflows, relationships between actors, and data structures that support system implementation.
+To explain the business model transformation from the existing system to the new OCR and Blockchain-based system, this research models the business process using Business Process Model and Notation (BPMN) and Unified Modeling Language (UML). These models are used to illustrate automated workflows, relationships between actors, and data structures that support system implementation. UML provides a comprehensive framework for modeling different perspectives of business processes, including control flow through activity diagrams, organizational structures through class and object diagrams, and interaction patterns through sequence diagrams~\cite{engels2005process}. This multi-perspective approach enables a complete representation of the fuel consumption recording system from various stakeholder viewpoints.
 
 \subsubsection{Business Process Model and Notation (BPMN)}
 
@@ -185,6 +231,8 @@ To explain the business model transformation from the existing system to the new
 \end{figure}
 
 Figure 4 presents the BPMN model of the automated fuel recording process, illustrating the interaction between drivers, automation system (n8n and OCR), admin, finance, and blockchain network.
+
+The Business Process Model and Notation (BPMN 2.0) is adopted as the standard notation for modeling the fuel consumption recording workflow due to its widespread acceptance and comprehensibility across diverse stakeholder groups~\cite{thom2020introducao}. BPMN 2.0 provides a rich set of modeling elements including events, activities, gateways, and data objects that enable precise representation of complex business processes while remaining understandable to both technical and non-technical audiences~\cite{thom2020introducao}. The notation supports the documentation of process flows from discovery through implementation phases of the Business Process Management (BPM) lifecycle, facilitating communication among process participants, analysts, and system developers.
 
 The process begins when a driver sends a fuel receipt photo via WhatsApp. The message is forwarded by n8n automation to the OCR Service to perform text extraction and identify information such as gas station number, transaction date, fuel volume, price per liter, and total cost.
 
@@ -328,7 +376,9 @@ The high accuracy rate of OCR extraction demonstrates that PaddleOCR is well-sui
 
 \subsection{Discussion}
 
-The integration of OCR and Blockchain in this system successfully creates a transparent, trusted, and traceable fuel consumption recording mechanism. The use of PaddleOCR proves effective for extracting data from fuel receipts, while Hyperledger Fabric guarantees data integrity through an immutable ledger. This system addresses the limitations of previous research [5] by implementing a real-time approach with multi-role validation in the logistics operational context.
+The integration of OCR and Blockchain in this system successfully creates a transparent, trusted, and traceable fuel consumption recording mechanism. The use of PaddleOCR proves effective for extracting data from fuel receipts, while Hyperledger Fabric guarantees data integrity through an immutable ledger. This system addresses the limitations of previous research~\cite{abubo2024blockchain} by implementing a real-time approach with multi-role validation in the logistics operational context.
+
+The concept of transparency, trust, and traceability (3T) implemented in this fuel recording system demonstrates broad applicability across different operational domains. Recent research by Falgenti et al. (2025) applied similar principles in developing a traceability system for palm oil supply chains, where plantations are evaluated and classified based on sustainability implementation levels before being integrated into a traceable supply chain~\cite{falgenti2025enhancing}. The segregation approach employed in their system, which separates FFB trucks from certified plantations and those lacking proper documentation at weighbridges, parallels our system's methodology of segregating validated fuel transactions (recorded on blockchain) from those that fail validation~\cite{falgenti2025enhancing}. This cross-domain validation strengthens the case for adopting systematic traceability systems as a general solution to operational transparency challenges in logistics and supply chain management.
 
 The system effectively solves the three fundamental problems (3T) identified in the existing manual system:
 
@@ -343,6 +393,8 @@ The system effectively solves the three fundamental problems (3T) identified in 
 However, challenges remain regarding suboptimal image quality that can reduce OCR accuracy. Images taken in poor lighting conditions, with blurred focus, or at improper angles may result in lower extraction accuracy rates. In the future, the system can be enhanced by adding image preprocessing capabilities such as contrast enhancement, perspective correction, and noise reduction. Additionally, implementing more robust OCR models trained specifically on diverse receipt formats and lighting conditions could further improve accuracy across varying operational scenarios.
 
 Another potential improvement involves implementing machine learning-based anomaly detection to automatically flag suspicious transactions based on historical patterns, reducing the validation burden on human reviewers while maintaining security and compliance standards.
+
+
 
 \section{Conclusion}
 
@@ -366,25 +418,20 @@ The authors wish to thank Nusa Mandiri University for supporting this research.
 
 \newpage
 
-\begin{thebibliography}{99}
-\bibitem{1} Y. Du et al., "PP-OCR: A Practical Ultra Lightweight OCR System," arXiv preprint arXiv:2009.09941, 2020.
-\bibitem{2} PaddlePaddle Authors, "PaddleOCR: Awesome Multilingual OCR Toolkits," GitHub repository, 2021.
-\bibitem{3} [Invoice Processing with PaddleOCR reference - to be completed]
-\bibitem{4} [Blockchain in Supply Chain reference - to be completed]
-\bibitem{5} S. Abubo, "Government Document Management System Based on Blockchain and OCR," International Journal of Information Technology, 2024.
-\end{thebibliography}
+\bibliographystyle{plain}
+\bibliography{ref}
 
 \newpage
 
 \begin{AuthorsProfiles}
 \authoritem{fig/kenny.png}{%
-\noindent \textbf{Kenny Aldi} is a student at the Faculty of Computer Science, Nusa Mandiri University, with research interests in artificial intelligence, blockchain technology, and document automation systems.}
+\noindent \textbf{Kenny Aldi} an experienced IT professional currently pursuing his Master's degree (S2) in Computer Science at Universitas Nusa Mandiri. His career began as an Application Implementor and evolved into a comprehensive IT Support role where he has demonstrated proficiency across multiple technical domains including network administration using MikroTik routers, Windows Server management with SQL Server databases, application development using PHP Laravel framework, as well as corporate hosting and domain administration. He is highly enthusiastic about Artificial Intelligence and Blockchain technology, continuously exploring these emerging fields to expand his expertise.}
 
-\authoritem{fig/kursehi.jpeg}{\noindent \textbf{Kursehi Falgenti} is a faculty member at Nusa Mandiri University with expertise in information systems and software engineering.}
+\authoritem{fig/kursehi.jpeg}{\noindent \textbf{Kursehi Falgenti} is an experienced educator and technology professional who holds a Doctor of Philosophy (Ph.D.) in Agricultural Engineering (Teknik Industri Pertanian) from IPB University. Currently serving as a Full-time Lecturer at Universitas Nusa Mandiri since September 2020, based in Jakarta, Indonesia, he has over 5 years of teaching experience in a hybrid learning environment. He specializes in teaching Artificial Intelligence, Machine Learning, Business Intelligence, and Blockchain technology. His expertise encompasses Artificial Intelligence (AI), Blockchain, Research Skills, and multiple other technical competencies, making him a well-rounded academic professional dedicated to advancing knowledge in emerging technology fields.}
 
-\authoritem{fig/nasir.jpeg}{\noindent \textbf{Nasir Hamzah} is a researcher at Nusa Mandiri University specializing in blockchain technology and distributed systems.}
+\authoritem{fig/nasir.jpeg}{\noindent \textbf{Nasir Hamzah} is  is an experienced IT professional specializing in system support and database administration with a strong background in troubleshooting system errors, software, hardware, and database management across all operating systems. Currently pursuing his Master's degree (S2) in Computer Science at Universitas Nusa Mandiri, he serves as a Database Administrator at Pemerintah Daerah Depok, Jawa Barat, Indonesia since April 2022, where he applies his expertise in Tableau Online, Strategic Planning, and various database management technologies. Prior to this role, he worked as an Information Technology System Support at Primaya Hospital in Bekasi, West Java from January 2017 to April 2022, accumulating over 5 years of experience in healthcare IT infrastructure. He is highly enthusiastic about Artificial Intelligence and Blockchain technology, continuously exploring these emerging fields to enhance his technical expertise.}
 
-\authoritem{fig/ragil.jpg}{\noindent \textbf{Ragil Yulianto} is a lecturer at Nusa Mandiri University with research focus on artificial intelligence and machine learning applications.}
+\authoritem{fig/ragil.jpg}{\noindent \textbf{Ragil Yulianto}  is an IT professional currently pursuing his Master's degree (S2) in Computer Science at Universitas Nusa Mandiri. He serves as a Pranata Komputer Pertama (Junior Computer Analyst) at the Ministry of Finance (Kementerian Keuangan), specializing as a Back End Developer where he applies his technical expertise in server-side application development and system architecture.}
 
 \authoritem{fig/firman.jpeg}{\noindent \textbf{Muhammad Firmansyah} is a faculty member at Nusa Mandiri University with expertise in computer vision and intelligent systems.}\relax
 \end{AuthorsProfiles}
